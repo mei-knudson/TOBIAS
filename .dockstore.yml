@@ -5,7 +5,7 @@ workflows:
      primaryDescriptorPath: /TOBIAS.wdl
      filters:  # Only develop or master branches and localAligner/** tags
          branches:
-             - master
+             - main
          tags:
              - /.*/
 
