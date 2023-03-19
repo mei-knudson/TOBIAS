@@ -76,16 +76,17 @@ task ATACorrect {
             --peaks ~{peaks} \
             --blacklist ~{blacklist} \
             --outdir ~{outdir} \
-            --cores ~{cores}
+            --cores ~{cores} \
+            --prefix ~{prefix}
     >>>
 
     output {
         File sorted_bam = "~{sorted_bam}"
-        File uncorrected_bw = glob('~{outdir}/*_uncorrected.bw')[0]
-        File bias_bw = glob('~{outdir}/*_bias.bw')[0]
-        File expected_bw = glob('~{outdir}/*_expected.bw')[0]
-        File corrected_bw = glob('~{outdir}/*_corrected.bw')[0]
-        File atacorrect_pdf = glob('~{outdir}/*_atacorrect.pdf')[0]
+        File uncorrected_bw = "~{outdir}/~{prefix}_uncorrected.bw"
+        File bias_bw = "~{outdir}/~{prefix}_bias.bw"
+        File expected_bw = "~{outdir}/~{prefix}_expected.bw"
+        File corrected_bw = "~{outdir}/~{prefix}_corrected.bw"
+        File atacorrect_pdf = "~{outdir}/~{prefix}_atacorrect.pdf"
     }
 
     runtime {
