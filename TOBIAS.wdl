@@ -7,6 +7,7 @@ workflow tobias {
         File peaks
         File blacklist
         File motifs
+        String prefix
         String docker_image = "mknudson/tobias"
         Int cores = 8
     }
@@ -54,18 +55,23 @@ task ATACorrect {
         File genome
         File peaks
         File blacklist
+        String prefix
         String outdir = "ATACorrect"
         String docker_image
         Int cores
     }
 
+    String sorted_bam = "~{prefix}.sorted.bam"
+
     command <<<
         set -e
 
-        samtools index -@ ~{cores} ~{bam} ~{bam}.bai
+        samtools sort -n ~{bam} -o ~{sorted_bam}
+
+        samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
 
         $(which TOBIAS) ATACorrect \
-            --bam ~{bam} \
+            --bam ~{sorted_bam} \
             --genome ~{genome} \
             --peaks ~{peaks} \
             --blacklist ~{blacklist} \
@@ -74,6 +80,7 @@ task ATACorrect {
     >>>
 
     output {
+        File sorted_bam = "~{sorted_bam}"
         File uncorrected_bw = glob('~{outdir}/*_uncorrected.bw')[0]
         File bias_bw = glob('~{outdir}/*_bias.bw')[0]
         File expected_bw = glob('~{outdir}/*_expected.bw')[0]
