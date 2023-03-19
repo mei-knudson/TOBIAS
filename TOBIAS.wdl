@@ -63,20 +63,20 @@ task ATACorrect {
         set -e
 
         $(which TOBIAS) ATACorrect \
-            --bam ${bam} \
-            --genome ${genome} \
-            --peaks ${peaks} \
-            --blacklist ${blacklist} \
-            --outdir ${outdir} \
-            --cores ${cores}
+            --bam ~{bam} \
+            --genome ~{genome} \
+            --peaks ~{peaks} \
+            --blacklist ~{blacklist} \
+            --outdir ~{outdir} \
+            --cores ~{cores}
     >>>
 
     output {
-        File uncorrected_bw = glob('${outdir}/*_uncorrected.bw')[0]
-        File bias_bw = glob('${outdir}/*_bias.bw')[0]
-        File expected_bw = glob('${outdir}/*_expected.bw')[0]
-        File corrected_bw = glob('${outdir}/*_corrected.bw')[0]
-        File atacorrect_pdf = glob('${outdir}/*_atacorrect.pdf')[0]
+        File uncorrected_bw = glob('~{outdir}/*_uncorrected.bw')[0]
+        File bias_bw = glob('~{outdir}/*_bias.bw')[0]
+        File expected_bw = glob('~{outdir}/*_expected.bw')[0]
+        File corrected_bw = glob('~{outdir}/*_corrected.bw')[0]
+        File atacorrect_pdf = glob('~{outdir}/*_atacorrect.pdf')[0]
     }
 
     runtime {
@@ -98,10 +98,10 @@ task ScoreBigwig {
         set -e
 
         $(which TOBIAS) FootprintScores \
-            --signal ${corrected_bw} \
-            --regions ${peaks} \
-            --output ${outfile} \
-            --cores ${cores}
+            --signal ~{corrected_bw} \
+            --regions ~{peaks} \
+            --output ~{outfile} \
+            --cores ~{cores}
     >>>
 
     output {
@@ -129,20 +129,20 @@ task BINDetect {
         set -e
 
         $(which TOBIAS) BINDetect \
-            --motifs ${motifs} \
-            --signals ${footprint_bw} \
-            --genome ${genome} \
-            --peaks ${peaks} \
-            --outdir ${outdir} \
-            --cores ${cores}
+            --motifs ~{motifs} \
+            --signals ~{footprint_bw} \
+            --genome ~{genome} \
+            --peaks ~{peaks} \
+            --outdir ~{outdir} \
+            --cores ~{cores}
     >>>
 
     output {
-        File bindetect_results_txt = glob('${outdir}/*_bindetect_results.txt')[0]
-        File bindetect_results_xlsx = glob('${outdir}/*_bindetect_results.xlsx')[0]
-        File bindetect_figures = glob('${outdir}/bindetect_figures.pdf')[0]
-        File distance_matrix = glob('${outdir}/TF_distance_matrix.txt')[0]
-        Array[File] tf_files = glob('${outdir}/*/*')
+        File bindetect_results_txt = glob('~{outdir}/*_bindetect_results.txt')[0]
+        File bindetect_results_xlsx = glob('~{outdir}/*_bindetect_results.xlsx')[0]
+        File bindetect_figures = glob('~{outdir}/bindetect_figures.pdf')[0]
+        File distance_matrix = glob('~{outdir}/TF_distance_matrix.txt')[0]
+        Array[File] tf_files = glob('~{outdir}/*/*')
     }
 
     runtime {
