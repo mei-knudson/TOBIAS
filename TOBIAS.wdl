@@ -94,6 +94,7 @@ task ATACorrect {
     runtime {
         cpu: cores
         docker: docker_image
+        memory: "16 GB"
     }
 }
 
