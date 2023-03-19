@@ -4,6 +4,7 @@ workflow tobias {
     input {
         File bam
         File genome
+        File genome_index
         File peaks
         File blacklist
         File motifs
@@ -16,6 +17,8 @@ workflow tobias {
         input:
             bam = bam,
             genome = genome,
+            genome_index = genome_index,
+            prefix = prefix,
             peaks = peaks,
             blacklist = blacklist,
             docker_image = docker_image,
@@ -53,6 +56,7 @@ task ATACorrect {
     input {
         File bam
         File genome
+        File genome_index
         File peaks
         File blacklist
         String prefix
@@ -69,8 +73,6 @@ task ATACorrect {
         samtools sort ~{bam} -o ~{sorted_bam}
 
         samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
-
-        samtools faidx ~{genome}
 
         $(which TOBIAS) ATACorrect \
             --bam ~{sorted_bam} \
