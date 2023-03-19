@@ -28,7 +28,7 @@ workflow tobias {
     call ScoreBigwig {
         input:
             corrected_bw = ATACorrect.corrected_bw,
-            peaks = peaks,
+            peaks = ATACorrect.bed,
             docker_image = docker_image,
             cores = cores
     }
@@ -38,7 +38,7 @@ workflow tobias {
             footprint_bw = ScoreBigwig.footprint_bw,
             motifs = motifs,
             genome = genome,
-            peaks = peaks, 
+            peaks = ATACorrect.bed, 
             docker_image = docker_image,     
             cores = cores
     }
@@ -66,6 +66,7 @@ task ATACorrect {
     }
 
     String sorted_bam = "~{prefix}.sorted.bam"
+    String bed = "~{prefix}.bed"
 
     command <<<
         set -e
@@ -74,10 +75,12 @@ task ATACorrect {
 
         samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
 
+        gunzip ~{peaks} | cut -f 1-6 > ~{bed}
+
         $(which TOBIAS) ATACorrect \
             --bam ~{sorted_bam} \
             --genome ~{genome} \
-            --peaks ~{peaks} \
+            --peaks ~{bed} \
             --blacklist ~{blacklist} \
             --outdir ~{outdir} \
             --cores ~{cores} \
@@ -85,6 +88,7 @@ task ATACorrect {
     >>>
 
     output {
+        File bed = "~{bed}"
         File sorted_bam = "~{sorted_bam}"
         File uncorrected_bw = "~{outdir}/~{prefix}_uncorrected.bw"
         File bias_bw = "~{outdir}/~{prefix}_bias.bw"
