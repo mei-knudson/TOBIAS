@@ -70,6 +70,8 @@ task ATACorrect {
 
         samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
 
+        samtools faidx ~{genome}
+
         $(which TOBIAS) ATACorrect \
             --bam ~{sorted_bam} \
             --genome ~{genome} \
