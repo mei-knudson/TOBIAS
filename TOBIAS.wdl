@@ -62,6 +62,8 @@ task ATACorrect {
     command <<<
         set -e
 
+        samtools index -@ ~{cores} ~{bam} ~{bam}.bai
+
         $(which TOBIAS) ATACorrect \
             --bam ~{bam} \
             --genome ~{genome} \

@@ -4,6 +4,7 @@ LABEL maintainer="Mei Knudson"
 
 # To prevent time zone prompt
 ENV DEBIAN_FRONTEND=noninteractive
+ENV SAMTOOLS_VERSION 1.9
 
 # Install softwares from apt repo
 RUN apt-get update && apt-get install -y \
@@ -23,8 +24,13 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev &&\
     rm -rf /var/lib/apt/lists/*
 
+# Install samtools 1.9
+RUN git clone --branch ${SAMTOOLS_VERSION} --single-branch https://github.com/samtools/samtools.git && \
+    git clone --branch ${SAMTOOLS_VERSION} --single-branch https://github.com/samtools/htslib.git && \
+    cd samtools && make && make install && cd ../ && rm -rf samtools* htslib*
+
 # Install packages for python3 scripts
-RUN python3 -m pip install numpy TOBIAS
+RUN python3 -m pip install numpy pysam TOBIAS
 
 # Create and setup new user
 ENV USER=tobias
