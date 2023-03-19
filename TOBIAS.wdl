@@ -66,7 +66,7 @@ task ATACorrect {
     command <<<
         set -e
 
-        samtools sort -n ~{bam} -o ~{sorted_bam}
+        samtools sort ~{bam} -o ~{sorted_bam}
 
         samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
 
