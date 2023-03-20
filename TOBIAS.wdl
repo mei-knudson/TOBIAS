@@ -196,10 +196,10 @@ task BINDetect {
     >>>
 
     output {
-        File bindetect_results_txt = "~{outdir}/~{prefix}_bindetect_results.txt"
-        File bindetect_results_xlsx = "~{outdir}/~{prefix}_bindetect_results.xlsx"
-        File bindetect_figures = "~{outdir}/~{prefix}_bindetect_figures.pdf"
-        File bindetect_distances = "~{outdir}/~{prefix}_bindetect_distances.txt"
+        File bindetect_results_txt = "~{outdir}/~{prefix}_results.txt"
+        File bindetect_results_xlsx = "~{outdir}/~{prefix}_results.xlsx"
+        File bindetect_figures = "~{outdir}/~{prefix}_figures.pdf"
+        File bindetect_distances = "~{outdir}/~{prefix}_distances.txt"
     }
 
     runtime {
