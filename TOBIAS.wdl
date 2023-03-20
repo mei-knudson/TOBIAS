@@ -1,6 +1,12 @@
 version 1.0
 
 workflow tobias {
+    meta {
+        version: "v0.1"
+        author: "Mei Knudson; tools from Mette Bensen at Looso Lab https://github.com/loosolab/TOBIAS"
+        description: "Workflow to run TOBIAS using outputs from ENCODE bulk ATAC-seq processing pipeline"
+    }
+
     input {
         File bam
         File genome
@@ -11,6 +17,27 @@ workflow tobias {
         String prefix
         String docker_image = "mknudson/tobias"
         Int cores = 8
+    }
+
+    parameter_meta {
+        bam: {
+            description: "Unsorted BAM file (.bam)"
+        }
+        genome: {
+            description: "Genome FASTA file (.fasta)"
+        }
+        genome_index: {
+            description: "Genome index file (.fasta.fai)"
+        }
+        peaks: {
+            description: "Narrowpeak peak file (.narrowpeak.gz)"
+        }
+        blacklist: {
+            description: "Genome blacklist file (.bed)"
+        }
+        motifs: {
+            description: "Motif file (PFM, JASPAR, or MEME format)"
+        }
     }
 
     call ATACorrect {
@@ -29,6 +56,7 @@ workflow tobias {
         input:
             corrected_bw = ATACorrect.corrected_bw,
             peaks = ATACorrect.bed,
+            prefix = prefix,
             docker_image = docker_image,
             cores = cores
     }
@@ -39,6 +67,7 @@ workflow tobias {
             motifs = motifs,
             genome = genome,
             peaks = ATACorrect.bed, 
+            prefix = prefix,
             docker_image = docker_image,     
             cores = cores
     }
@@ -71,10 +100,13 @@ task ATACorrect {
     command <<<
         set -e
 
+        # Sort bam prior to indexing
         samtools sort ~{bam} -o ~{sorted_bam}
 
+        # Index bam
         samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
 
+        # Unzip narrowpeak file and convert to bed
         gunzip -c ~{peaks} | cut -f 1-6 > ~{bed}
 
         $(which TOBIAS) ATACorrect \
@@ -89,7 +121,6 @@ task ATACorrect {
 
     output {
         File bed = "~{bed}"
-        File sorted_bam = "~{sorted_bam}"
         File uncorrected_bw = "~{outdir}/~{prefix}_uncorrected.bw"
         File bias_bw = "~{outdir}/~{prefix}_bias.bw"
         File expected_bw = "~{outdir}/~{prefix}_expected.bw"
@@ -101,6 +132,7 @@ task ATACorrect {
         cpu: cores
         docker: docker_image
         memory: "16 GB"
+        disks: "local-disk"
     }
 }
 
@@ -108,10 +140,12 @@ task ScoreBigwig {
     input {
         File corrected_bw
         File peaks
-        String outfile = "footprints.bw"
+        String prefix
         String docker_image
         Int cores
     }
+
+    String footprints = "~{prefix}.footprints.bw"
 
     command <<<
         set -e
@@ -119,17 +153,18 @@ task ScoreBigwig {
         $(which TOBIAS) FootprintScores \
             --signal ~{corrected_bw} \
             --regions ~{peaks} \
-            --output ~{outfile} \
+            --output ~{footprints} \
             --cores ~{cores}
     >>>
 
     output {
-        File footprint_bw = "~{outfile}"
+        File footprint_bw = "~{footprints}"
     }
 
     runtime {
         cpu: cores
         docker: docker_image
+        disks: "local-disk"
     }
 }
 
@@ -139,6 +174,7 @@ task BINDetect {
         File motifs
         File genome
         File peaks
+        String prefix
         String outdir = "BINDetect"
         String docker_image
         Int cores
@@ -152,20 +188,22 @@ task BINDetect {
             --signals ~{footprint_bw} \
             --genome ~{genome} \
             --peaks ~{peaks} \
+            --prefix ~{prefix} \
             --outdir ~{outdir} \
             --cores ~{cores}
     >>>
 
     output {
-        File bindetect_results_txt = glob('~{outdir}/*_bindetect_results.txt')[0]
-        File bindetect_results_xlsx = glob('~{outdir}/*_bindetect_results.xlsx')[0]
-        File bindetect_figures = glob('~{outdir}/bindetect_figures.pdf')[0]
-        File distance_matrix = glob('~{outdir}/TF_distance_matrix.txt')[0]
-        Array[File] tf_files = glob('~{outdir}/*/*')
+        File bindetect_results_txt = "~{outdir}/~{prefix}_bindetect_results.txt"
+        File bindetect_results_xlsx = "~{outdir}/~{prefix}_bindetect_results.xlsx"
+        File bindetect_figures = "~{outdir}/~{prefix}_bindetect_figures.pdf"
+        Array[File] tf_files = glob("~{outdir}/*")
     }
 
     runtime {
         cpu: cores
         docker: docker_image
+        disks: "local-disk"
     }
 }
+
