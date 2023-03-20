@@ -200,7 +200,6 @@ task BINDetect {
         File bindetect_results_xlsx = "~{outdir}/~{prefix}_bindetect_results.xlsx"
         File bindetect_figures = "~{outdir}/~{prefix}_bindetect_figures.pdf"
         File bindetect_distances = "~{outdir}/~{prefix}_bindetect_distances.txt"
-        Array[File] tf_files = glob("~{outdir}/*/*")
     }
 
     runtime {
