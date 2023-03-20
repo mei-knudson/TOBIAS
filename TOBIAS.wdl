@@ -75,7 +75,7 @@ task ATACorrect {
 
         samtools index -@ ~{cores} ~{sorted_bam} ~{sorted_bam}.bai
 
-        gunzip ~{peaks} | cut -f 1-6 > ~{bed}
+        gunzip -c ~{peaks} | cut -f 1-6 > ~{bed}
 
         $(which TOBIAS) ATACorrect \
             --bam ~{sorted_bam} \
