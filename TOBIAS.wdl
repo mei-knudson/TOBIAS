@@ -66,6 +66,7 @@ workflow tobias {
             footprint_bw = ScoreBigwig.footprint_bw,
             motifs = motifs,
             genome = genome,
+            genome_index = genome_index,
             peaks = ATACorrect.bed, 
             prefix = prefix,
             docker_image = docker_image,     
@@ -173,6 +174,7 @@ task BINDetect {
         File footprint_bw
         File motifs
         File genome
+        File genome_index
         File peaks
         String prefix
         String outdir = "BINDetect"
@@ -197,7 +199,8 @@ task BINDetect {
         File bindetect_results_txt = "~{outdir}/~{prefix}_bindetect_results.txt"
         File bindetect_results_xlsx = "~{outdir}/~{prefix}_bindetect_results.xlsx"
         File bindetect_figures = "~{outdir}/~{prefix}_bindetect_figures.pdf"
-        Array[File] tf_files = glob("~{outdir}/*")
+        File bindetect_distances = "~{outdir}/~{prefix}_bindetect_distances.txt"
+        Array[File] tf_files = glob("~{outdir}/*/*")
     }
 
     runtime {
