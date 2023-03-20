@@ -133,7 +133,7 @@ task ATACorrect {
         cpu: cores
         docker: docker_image
         memory: "16 GB"
-        disks: "local-disk"
+        disks: "local-disk 50 LOCAL"
     }
 }
 
@@ -165,7 +165,7 @@ task ScoreBigwig {
     runtime {
         cpu: cores
         docker: docker_image
-        disks: "local-disk"
+        disks: "local-disk 50 LOCAL"
     }
 }
 
@@ -206,7 +206,7 @@ task BINDetect {
     runtime {
         cpu: cores
         docker: docker_image
-        disks: "local-disk"
+        disks: "local-disk 50 LOCAL"
     }
 }
 
